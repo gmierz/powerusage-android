@@ -1,0 +1,124 @@
+import os
+import datetime
+import time
+
+from data_saver import DataSaver
+from adb_utils import (
+	charge_battery,
+	discharge_battery,
+	disable_charging,
+	enable_charging,
+	get_battery_info,
+	get_battery_level,
+	parse_battery_info,
+	wait_for_drop,
+)
+from utils import (
+	finish_same_line,
+	write_same_line
+)
+
+OUTPUT = '/home/sparky/Documents/mozwork/'
+RESOLUTION = 4 # time between data points in seconds
+PERCENT_INTERVALS = [
+	(100,90), (90,80), (80,70),
+	(70,60), (60,50), (50,40),
+	(40,30), (30,20), (20,10),
+	(15,5)
+]
+TRIALS = 2
+
+
+def main():
+	print("Running OS baseline test.\n")
+	print("Make sure you have no apps running in the background.")
+	print("Make sure that there is a wakelock app running.")
+	print("Charging is disabled and enabled automatically when we reach 5%.")
+
+	_ = input("Press enter when ready...")
+	ds = DataSaver(OUTPUT)
+	ds.start()
+
+	print("Disabling charging...")
+	disable_charging()
+	input("Is it disabled?")
+	print("Start time: {}".format(datetime.datetime.utcnow()))
+
+	for startpercent, endpercent in PERCENT_INTERVALS:
+		print("On percent interval: {} to {}".format(
+			startpercent, endpercent
+		))
+		trialtimes = []
+		for trialnum in range(TRIALS):
+			print("Running trial {}".format(trialnum))
+			info = parse_battery_info(get_battery_info())
+			if int(info['level']) <= startpercent:
+				charge_battery(startpercent)
+			elif int(info['level']) > startpercent:
+				discharge_battery(startpercent, currlevel=info['level'])
+
+			outputdir = 'pc_breakdown_{}-{}-{}'.format(
+				startpercent, endpercent, trialnum
+			)
+			os.mkdir(os.path.join(OUTPUT, outputdir))
+
+			starttime = time.time()
+
+			try:
+				level = 1000
+				prevcharge = 0
+				prevlevel = 0
+				prevtemp = 0
+				while level != endpercent:
+					start = time.time()
+
+					info = parse_battery_info(get_battery_info())
+					info['timestamp'] = time.time()
+					ds.add(info, os.path.join(outputdir, 'batterydata'))
+					level = int(info['level'])
+
+					if prevcharge != info['Charge counter'] or \
+					   prevlevel != level or prevtemp != info['temperature']:
+						finish_same_line()
+					write_same_line("{} | Current capacity: {}%, {}, Temp: {}".format(
+						datetime.datetime.utcnow(), str(level),
+						info['Charge counter'], info['temperature']
+					))
+
+					prevlevel = level
+					prevcharge = info['Charge counter']
+					prevtemp = info['temperature']
+
+					end = time.time()
+					telapsed = end - start
+
+					if telapsed < RESOLUTION:
+						time.sleep(RESOLUTION - telapsed)
+			except Exception as e:
+				enable_charging()
+				raise
+
+			endtime = time.time()
+			trialtimes.append(endtime-starttime)
+
+			finish_same_line()
+
+		print("Trial times for {} to {}: {}".format(
+			startpercent, endpercent, str(trialtimes)
+		))
+
+		ds.add(
+			{'trial-times': trialtimes},
+			'ttimes_pc_breakdown_{}-{}'.format(startpercent, endpercent)
+		)
+
+	print("Enabling charging...")
+	enable_charging()
+
+	print("Stopping data saver...")
+	ds.stop_running()
+	print("Done.")
+
+
+if __name__=="__main__":
+	main()

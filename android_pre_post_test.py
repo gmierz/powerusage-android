@@ -6,7 +6,8 @@ from adb_utils import (
 	disable_charging,
 	enable_charging,
 	get_battery_info,
-	parse_battery_info
+	parse_battery_info,
+	wait_for_drop
 )
 from utils import (
 	finish_same_line,
@@ -16,17 +17,6 @@ from utils import (
 OUTPUT = '/home/sparky/Documents/mozwork/'
 RESOLUTION = 4 # time between data points in seconds
 TESTTIME = 20 # minutes
-
-
-def wait_for_drop():
-	dropped = False
-	level = parse_battery_info(get_battery_info())['level']
-	while not dropped:
-		currlevel = parse_battery_info(get_battery_info())['level']
-		if level != currlevel:
-			dropped = True
-			break
-		time.sleep(5)
 
 
 def main():

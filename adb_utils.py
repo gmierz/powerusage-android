@@ -45,3 +45,46 @@ def parse_battery_info(batinfo):
 		info[name] = val
 	return info
 
+def wait_for_drop():
+	dropped = False
+	level = parse_battery_info(get_battery_info())['level']
+	while not dropped:
+		currlevel = parse_battery_info(get_battery_info())['level']
+		if level != currlevel:
+			dropped = True
+			break
+		time.sleep(5)
+
+def get_battery_level():
+	return int(parse_battery_info(get_battery_info())['level'])
+
+def discharge_battery(targetlevel, currlevel=None):
+	if not currlevel:
+		currlevel = get_battery_level()
+	while currlevel != targetlevel:
+		wait_for_drop()
+		currlevel = get_battery_level()
+		write_same_line(
+			"Discharging to {}, currently at {}".format(
+				str(targetlevel), str(get_battery_level())
+			)
+		)
+	finish_same_line()
+
+def charge_battery(targetlevel):
+	currlevel = get_battery_level()
+	if currlevel == targetlevel:
+		discharge_battery(currlevel - 1, currlevel=currlevel)
+
+	print("Started charging...")
+	enable_charging()
+	while currlevel != targetlevel:
+		time.sleep(5)
+		currlevel = get_battery_level()
+		write_same_line(
+			"Charging to {}, curently at {}".format(str(targetlevel), str(currlevel))
+		)
+	finish_same_line()
+
+	print("Finished charging, disabling it now...")
+	disable_charging()
