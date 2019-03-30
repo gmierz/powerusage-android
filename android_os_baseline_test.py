@@ -1,4 +1,5 @@
 import os
+import datetime
 import json
 import time
 import subprocess
@@ -18,7 +19,7 @@ from utils import (
 OUTPUT = '/home/sparky/Documents/mozwork/'
 RESOLUTION = 4 # time between data points in seconds
 SAVERINTERVAL = 5 # seconds
-FINALLEVEL = 99
+FINALLEVEL = 5
 
 
 class DataSaver(Thread):
@@ -33,7 +34,7 @@ class DataSaver(Thread):
 		if not self.stop:
 			self.queue.append({'info': info, 'name': name})
 
-	def stop(self):
+	def stop_running(self):
 		self.stop = True
 		while self.queue:
 			print("{} items left in queue".format(str(len(self.queue))))
@@ -94,27 +95,32 @@ def main():
 	print("Disabling charging...")
 	disable_charging()
 	input("Is it disabled?")
+	print("Start time: {}".format(datetime.datetime.utcnow()))
 
 	try:
 		level = 1000
 		prevcharge = 0
 		prevlevel = 0
+		prevtemp = 0
 		while level != FINALLEVEL:
 			start = time.time()
 
 			info = parse_battery_info(get_battery_info())
-			level = int(info['level'])
+			info['timestamp'] = time.time()
 			ds.add(info, 'batterydata')
+			level = int(info['level'])
 
-			if prevcharge != info['Charge counter']:
+			if prevcharge != info['Charge counter'] or \
+			   prevlevel != level or prevtemp != info['temperature']:
 				finish_same_line()
-			elif prevlevel != level:
-				finish_same_line()
-			write_same_line("Current capacity: {}%, {}".format(
-				str(level), info['Charge counter']
+			write_same_line("{} | Current capacity: {}%, {}, Temp: {}".format(
+				datetime.datetime.utcnow(), str(level),
+				info['Charge counter'], info['temperature']
 			))
+
 			prevlevel = level
 			prevcharge = info['Charge counter']
+			prevtemp = info['temperature']
 
 			end = time.time()
 			telapsed = end - start
@@ -131,7 +137,7 @@ def main():
 	enable_charging()
 
 	print("Stopping data saver...")
-	ds.stop()
+	ds.stop_running()
 	print("Done.")
 
 

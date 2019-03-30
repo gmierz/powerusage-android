@@ -9,4 +9,4 @@ def write_same_line(x, sleep_time=0.01):
     sleep(sleep_time)
 
 def finish_same_line():
-	stdout.write("\r  \r\n")
+	stdout.write("\r\r\n")
