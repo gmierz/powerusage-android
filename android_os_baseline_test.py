@@ -97,15 +97,24 @@ def main():
 
 	try:
 		level = 1000
+		prevcharge = 0
+		prevlevel = 0
 		while level != FINALLEVEL:
 			start = time.time()
 
 			info = parse_battery_info(get_battery_info())
 			level = int(info['level'])
 			ds.add(info, 'batterydata')
+
+			if prevcharge != info['Charge counter']:
+				finish_same_line()
+			elif prevlevel != level:
+				finish_same_line()
 			write_same_line("Current capacity: {}%, {}".format(
 				str(level), info['Charge counter']
 			))
+			prevlevel = level
+			prevcharge = info['Charge counter']
 
 			end = time.time()
 			telapsed = end - start
