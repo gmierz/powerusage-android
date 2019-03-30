@@ -1,16 +1,13 @@
-import os
 import datetime
-import json
 import time
-import subprocess
-from threading import Thread
 
+from data_saver import DataSaver
 from adb_utils import (
 	disable_charging,
 	enable_charging,
-	get_battery_info
+	get_battery_info,
+	parse_battery_info
 )
-
 from utils import (
 	finish_same_line,
 	write_same_line
@@ -22,66 +19,6 @@ SAVERINTERVAL = 5 # seconds
 FINALLEVEL = 5
 
 
-class DataSaver(Thread):
-	def __init__(self):
-		Thread.__init__(self)
-		self.output = os.path.join(OUTPUT, 'osbaseline' + str(int(time.time())))
-		os.mkdir(os.path.join(OUTPUT, 'osbaseline' + str(int(time.time()))))
-		self.queue = []
-		self.stop = False
-
-	def add(self, info, name):
-		if not self.stop:
-			self.queue.append({'info': info, 'name': name})
-
-	def stop_running(self):
-		self.stop = True
-		while self.queue:
-			print("{} items left in queue".format(str(len(self.queue))))
-			time.sleep(SAVERINTERVAL)
-
-	def run(self):
-		while (not self.stop) or self.queue:
-			if not self.queue:
-				time.sleep(SAVERINTERVAL)
-				continue
-			el = self.queue.pop(0)
-			with open(os.path.join(self.output, el['name'] + str(int(time.time())) + '.json'), 'w+') as f:
-				json.dump(el['info'], f)
-
-
-def parse_battery_info(batinfo):
-	'''
-	Parses an entry such as:
-		Current Battery Service state:
-		AC powered: false\n
-		USB powered: true\n
-		Wireless powered: false\n
-		Max charging current: 3000000\n
-		Max charging voltage: 5000000\n
-		Charge counter: 3991656\n
-		status: 2\n
-		health: 2\n
-		present: true\n
-		level: 96\n
-		scale: 100\n
-		voltage: 4387\n
-		temperature: 300\n
-		technology: Li-ion\n
-
-	'''
-	info = {}
-	lines = batinfo.decode("ascii").split('\n')
-	for line in lines[1:]: # Ignore the first line
-		if line == '':
-			continue
-		name, val = line.split(':')
-		name = name.strip()
-		val = val.strip()
-		info[name] = val
-	return info
-
-
 def main():
 	print("Running OS baseline test.\n")
 	print("Make sure you have no apps running in the background.")
@@ -89,7 +26,7 @@ def main():
 	print("Charging is disabled and enabled automatically when we reach 5%.")
 
 	_ = input("Press enter when ready...")
-	ds = DataSaver()
+	ds = DataSaver(OUTPUT)
 	ds.start()
 
 	print("Disabling charging...")
