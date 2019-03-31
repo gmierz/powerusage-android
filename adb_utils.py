@@ -1,4 +1,10 @@
 import subprocess
+import time
+
+from utils import (
+	write_same_line,
+	finish_same_line
+)
 
 def disable_charging():
 	subprocess.check_output(
@@ -13,6 +19,9 @@ def enable_charging():
 def get_battery_info():
 	res = subprocess.check_output(['adb', 'shell', 'dumpsys', 'battery'])
 	return res
+
+def get_battery_level():
+	return int(parse_battery_info(get_battery_info())['level'])
 
 def parse_battery_info(batinfo):
 	'''
@@ -48,19 +57,26 @@ def parse_battery_info(batinfo):
 def wait_for_drop():
 	dropped = False
 	level = parse_battery_info(get_battery_info())['level']
+	starttime = time.time()
+	finish_same_line()
 	while not dropped:
 		currlevel = parse_battery_info(get_battery_info())['level']
 		if level != currlevel:
 			dropped = True
 			break
 		time.sleep(5)
-
-def get_battery_level():
-	return int(parse_battery_info(get_battery_info())['level'])
+		currtime = time.time()
+		write_same_line(
+			"Time elapsed waiting for drop: {} seconds".format(
+			str(currtime-starttime)
+		))
+	finish_same_line()
 
 def discharge_battery(targetlevel, currlevel=None):
 	if not currlevel:
 		currlevel = get_battery_level()
+
+	disable_charging() # In case it wasn't already disabled
 	while currlevel != targetlevel:
 		wait_for_drop()
 		currlevel = get_battery_level()
@@ -73,7 +89,10 @@ def discharge_battery(targetlevel, currlevel=None):
 
 def charge_battery(targetlevel):
 	currlevel = get_battery_level()
+	decrease = False
 	if currlevel == targetlevel:
+		#decrease = True
+		#targetlevel += 1
 		discharge_battery(currlevel - 1, currlevel=currlevel)
 
 	print("Started charging...")
@@ -85,6 +104,9 @@ def charge_battery(targetlevel):
 			"Charging to {}, curently at {}".format(str(targetlevel), str(currlevel))
 		)
 	finish_same_line()
+
+	#if decrease:
+	#	discharge_battery(targetlevel - 1)
 
 	print("Finished charging, disabling it now...")
 	disable_charging()

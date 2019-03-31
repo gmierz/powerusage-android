@@ -20,13 +20,15 @@ from utils import (
 
 OUTPUT = '/home/sparky/Documents/mozwork/'
 RESOLUTION = 4 # time between data points in seconds
+
+# start percent is exclusive, end percent is inclusive
 PERCENT_INTERVALS = [
 	(100,90), (90,80), (80,70),
 	(70,60), (60,50), (50,40),
 	(40,30), (30,20), (20,10),
 	(15,5)
 ]
-TRIALS = 2
+TRIALS = 10
 
 
 def main():
@@ -42,25 +44,28 @@ def main():
 	print("Disabling charging...")
 	disable_charging()
 	input("Is it disabled?")
-	print("Start time: {}".format(datetime.datetime.utcnow()))
 
 	for startpercent, endpercent in PERCENT_INTERVALS:
-		print("On percent interval: {} to {}".format(
+		print("\nOn percent interval: {} to {}".format(
 			startpercent, endpercent
 		))
 		trialtimes = []
 		for trialnum in range(TRIALS):
-			print("Running trial {}".format(trialnum))
+			print("\nRunning trial {}, current times are {}".format(
+				trialnum, str(trialtimes)
+			))
+			print("Start time: {}".format(datetime.datetime.utcnow()))
 			info = parse_battery_info(get_battery_info())
 			if int(info['level']) <= startpercent:
 				charge_battery(startpercent)
 			elif int(info['level']) > startpercent:
-				discharge_battery(startpercent, currlevel=info['level'])
+				discharge_battery(startpercent)
 
-			outputdir = 'pc_breakdown_{}-{}-{}'.format(
+			dname = 'pc_breakdown_{}-{}-{}'.format(
 				startpercent, endpercent, trialnum
 			)
-			os.mkdir(os.path.join(OUTPUT, outputdir))
+			outputdir = os.path.join(ds.output, dname)
+			os.mkdir(outputdir)
 
 			starttime = time.time()
 
@@ -69,12 +74,12 @@ def main():
 				prevcharge = 0
 				prevlevel = 0
 				prevtemp = 0
-				while level != endpercent:
+				while level > endpercent: # end percent is inclusive
 					start = time.time()
 
 					info = parse_battery_info(get_battery_info())
 					info['timestamp'] = time.time()
-					ds.add(info, os.path.join(outputdir, 'batterydata'))
+					ds.add(info, os.path.join(dname, 'batterydata'))
 					level = int(info['level'])
 
 					if prevcharge != info['Charge counter'] or \

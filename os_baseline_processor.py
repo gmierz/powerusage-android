@@ -5,7 +5,7 @@ from matplotlib import pyplot as plt
 
 from utils import get_paths_from_dir
 
-RESULTSDIR = '/home/sparky/Documents/mozwork/osbaseline1553912322'
+RESULTSDIR = '/home/sparky/Documents/mozwork/osbaseline1553960001'
 MAXPC = 100
 MINPC = 5
 
@@ -65,9 +65,18 @@ def main():
 	for el in ccounterdata:
 		tmp.append((((el - mincc) * (MAXPC - MINPC)) / (maxcc - mincc)) + MINPC)
 
+	zcount = 0
+	for i in leveldata:
+		if i == 100:
+			zcount += 1
+		else:
+			break
+
 	plt.title("Charge counter (normalized to range [5%, 100%]) & Percent level over time")
 	plt.plot(times, tmp, label='Charge counter')
 	plt.plot(times, leveldata, label='Percent Level')
+	plt.plot(times, [p for p in np.arange(MINPC, MAXPC, step=(MAXPC-MINPC)/len(times))][::-1], label='Straight line')
+	plt.plot(times[zcount:], [p for p in np.arange(MINPC, MAXPC, step=(MAXPC-MINPC)/len(times[zcount:]))][::-1], label='Straight line')
 	plt.xlabel('Time (seconds)')
 	plt.ylabel('Percent capacity remaining')
 	hlines = [100, 80, 60, 40, 20, 0]
