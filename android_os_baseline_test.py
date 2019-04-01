@@ -20,7 +20,8 @@ def main():
     print("Running OS baseline test.\n")
     print("Make sure you have no apps running in the background.")
     print("Make sure that there is a wakelock app running.")
-    print("Charging is disabled and enabled automatically when we reach 5%.")
+    print("Charging is disabled at the beginning of the test")
+    print("and then enabled when we reach 5%.")
 
     _ = input("Press enter when ready...")
     ds = DataSaver(OUTPUT)

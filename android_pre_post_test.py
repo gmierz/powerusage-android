@@ -20,9 +20,11 @@ def main():
     print("Running Android Pre/Post test.\n")
     print("Make sure you have no extra apps running in the background.")
     print(
-        "Make sure that there is a wakelock app running (if going passed 30 minutes of testing)."
+        "Make sure that there is a wakelock app running"
+        "(if going passed 30 minutes of testing)."
     )
-    print("Charging is disabled and enabled automatically when we reach 5%.")
+    print("Charging is disabled before the test starts. It is")
+    print("enabled automatically when we reach the end of the test.")
 
     _ = input("Press enter when ready...")
     ds = DataSaver(OUTPUT)
@@ -35,7 +37,7 @@ def main():
     input("When the test is ready, start the recording by pressing enter...")
 
     print("Waiting for a percentage drop...")
-    # wait_for_drop()
+    wait_for_drop()
     print("Drop detected, starting test")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 
