@@ -108,10 +108,11 @@ def charge_battery(targetlevel):
         # decrease = True
         # targetlevel += 1
         discharge_battery(currlevel - 1, currlevel=currlevel)
+        currlevel = get_battery_level()
 
     print("Started charging...")
     enable_charging()
-    while currlevel != targetlevel:
+    while currlevel < targetlevel:
         time.sleep(5)
         currlevel = get_battery_level()
         write_same_line(

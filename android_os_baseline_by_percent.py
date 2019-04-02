@@ -20,11 +20,11 @@ RESOLUTION = 4  # time between data points in seconds
 
 # start percent is exclusive, end percent is inclusive
 PERCENT_INTERVALS = [
-    (100, 90),
-    (90, 80),
-    (80, 70),
-    (70, 60),
-    (60, 50),
+    #(100, 90),
+    #(90, 80),
+    #(80, 70),
+    #(70, 60),
+    #(60, 50),
     (50, 40),
     (40, 30),
     (30, 20),
@@ -39,11 +39,12 @@ def main():
     print("Make sure you have no apps running in the background.")
     print("Make sure that there is a wakelock app running.")
     print(
-        "Charging is disabled and enabled periodically throughout"
+        "Charging is disabled and enabled periodically throughout "
         "the tests to gather {} trials for {} percentage ranges.".format(
-            str(TRIALS)),
+            str(TRIALS),
             str(len(PERCENT_INTERVALS))
         )
+    )
 
     _ = input("Press enter when ready...")
     ds = DataSaver(OUTPUT)
