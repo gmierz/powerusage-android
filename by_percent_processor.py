@@ -33,6 +33,11 @@ def main():
         means.append(np.mean(batdata[pcrange]))
         stddevs.append(np.std(batdata[pcrange]))
 
+    pc_stds = []
+    for i, el in enumerate(means):
+        pc_stds.append(100 * (stddevs[i]/el))
+    print(pc_stds)
+
     plt.figure()
     plt.bar(
         np.arange(len(means)),
