@@ -43,9 +43,8 @@ MODELS = {
 
 def get_phone_model():
     res = subprocess.check_output(["adb", "devices", "-l"]).decode('ascii')
-    model = res.split('model:')[-1].split('device:')[0].strip()
     for modelname in MODELS:
-        if modelname in model:
+        if modelname in res:
             return MODELS[modelname](modelname)
     raise Exception("Could not find a PhoneModel for: %s" % model)
 
