@@ -167,7 +167,7 @@ def charge_battery(targetlevel, model=None):
     currlevel = get_battery_level()
     decrease = False
     if currlevel == targetlevel:
-        model.discharge_battery(currlevel - 1, currlevel=currlevel)
+        discharge_battery(currlevel - 1, currlevel=currlevel, model=model)
         currlevel = get_battery_level()
 
     print("Started charging...")
