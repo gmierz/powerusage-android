@@ -8,10 +8,10 @@ from adb_utils import (
     get_battery_info,
     parse_battery_info,
     wait_for_drop,
+    start_test
 )
 from utils import finish_same_line, write_same_line
 
-OUTPUT = "/home/sparky/Documents/mozwork/"
 RESOLUTION = 4  # time between data points in seconds
 TESTTIME = 1  # minutes
 
@@ -19,7 +19,8 @@ TESTTIME = 1  # minutes
 def main(args):
     OUTPUT = args.output
 
-    print("Running Android Pre/Post test.\n")
+    print("Running Android Pre/Post test.")
+    print("Running %s test.\n" % args.test)
     print("Make sure you have no extra apps running in the background.")
     print(
         "Make sure that there is a wakelock app running"
@@ -40,6 +41,9 @@ def main(args):
     print("Disabling charging...")
     model.disable_charging()
     input("Is it disabled?")
+
+    print("Attempting to start %s test..." % args.test)
+    start_test(args.test)
 
     input("When the test is ready, start the recording by pressing enter...")
 
@@ -83,5 +87,5 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = AndroidParser().parse_args()
+    args = AndroidParser().parse_args(require_tests=True)
     main(args)
