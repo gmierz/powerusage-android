@@ -26,7 +26,18 @@ def get_battery_data(datadir):
 def main():
     batdata = get_battery_data(RESULTSDIR)
 
-    ordering = ['100-90', '90-80', '80-70', '70-60', '60-50']
+    ordering = [
+        '100-90',
+        '90-80',
+        '80-70',
+        '70-60',
+        '60-50',
+        '50-40',
+        '40-30',
+        '30-20',
+        '20-10',
+        '15-5'
+    ]
     stddevs = []
     means = []
     for pcrange in ordering:

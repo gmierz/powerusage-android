@@ -4,22 +4,78 @@ import time
 from utils import write_same_line, finish_same_line
 
 
-def disable_charging():
+class PhoneModel():
+    def __init__(self, model):
+        self.model = model
+        self.disable_command = ''
+        self.enable_command = ''
+
+    def disable_charging(self):
+        disable_charging(model=self)
+
+    def enable_charging(self):
+        enable_charging(model=self)
+
+
+class PixelPhone(PhoneModel):
+    def __init__(self, model):
+        super(PixelPhone, self).__init__(model)
+        self.disable_command = \
+            "'echo 1 > /sys/class/power_supply/battery/input_suspend'"
+        self.enable_command = \
+            "'echo 0 > /sys/class/power_supply/battery/input_suspend'"
+
+
+class MotoG5Phone(PhoneModel):
+    def __init__(self, model):
+        super(MotoG5Phone, self).__init__(model)
+        self.disable_command = \
+            "'echo 0 > /sys/class/power_supply/battery/charging_enabled'"
+        self.enable_command = \
+            "'echo 1 > /sys/class/power_supply/battery/charging_enabled'"
+
+
+MODELS = {
+    'Pixel_2': PixelPhone,
+    'Moto_G__5': MotoG5Phone
+}
+
+
+def get_phone_model():
+    res = subprocess.check_output(["adb", "devices", "-l"]).decode('ascii')
+    model = res.split('model:')[-1].split('device:')[0].strip()
+    for modelname in MODELS:
+        if modelname in model:
+            return MODELS[modelname](modelname)
+    raise Exception("Could not find a PhoneModel for: %s" % model)
+
+
+def get_default_phone_model():
+    return PixelPhone('Pixel_2')
+
+
+def disable_charging(model=None):
+    if not model:
+        model = get_default_phone_model()
+
     subprocess.check_output(
         [
             "adb",
             "shell",
-            "su -c 'echo 1 > /sys/class/power_supply/battery/input_suspend'",
+            "su -c %s" % model.disable_command,
         ]
     )
 
 
-def enable_charging():
+def enable_charging(model=None):
+    if not model:
+        model = get_default_phone_model()
+
     subprocess.check_output(
         [
             "adb",
             "shell",
-            "su -c 'echo 0 > /sys/class/power_supply/battery/input_suspend'",
+            "su -c %s" % model.enable_command,
         ]
     )
 
@@ -85,11 +141,14 @@ def wait_for_drop():
     finish_same_line()
 
 
-def discharge_battery(targetlevel, currlevel=None):
+def discharge_battery(targetlevel, currlevel=None, model=None):
+    if not model:
+        model = get_default_phone_model()
+
     if not currlevel:
         currlevel = get_battery_level()
 
-    disable_charging()  # In case it wasn't already disabled
+    model.disable_charging()  # In case it wasn't already disabled
     while currlevel != targetlevel:
         wait_for_drop()
         currlevel = get_battery_level()
@@ -101,17 +160,18 @@ def discharge_battery(targetlevel, currlevel=None):
     finish_same_line()
 
 
-def charge_battery(targetlevel):
+def charge_battery(targetlevel, model=None):
+    if not model:
+        model = get_default_phone_model()
+
     currlevel = get_battery_level()
     decrease = False
     if currlevel == targetlevel:
-        # decrease = True
-        # targetlevel += 1
-        discharge_battery(currlevel - 1, currlevel=currlevel)
+        model.discharge_battery(currlevel - 1, currlevel=currlevel)
         currlevel = get_battery_level()
 
     print("Started charging...")
-    enable_charging()
+    model.enable_charging()
     while currlevel < targetlevel:
         time.sleep(5)
         currlevel = get_battery_level()
@@ -120,8 +180,5 @@ def charge_battery(targetlevel):
         )
     finish_same_line()
 
-    # if decrease:
-    # 	discharge_battery(targetlevel - 1)
-
     print("Finished charging, disabling it now...")
-    disable_charging()
+    model.disable_charging()

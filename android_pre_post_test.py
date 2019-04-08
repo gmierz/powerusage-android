@@ -3,8 +3,7 @@ import time
 
 from data_saver import DataSaver
 from adb_utils import (
-    disable_charging,
-    enable_charging,
+    get_phone_model,
     get_battery_info,
     parse_battery_info,
     wait_for_drop,
@@ -13,7 +12,7 @@ from utils import finish_same_line, write_same_line
 
 OUTPUT = "/home/sparky/Documents/mozwork/"
 RESOLUTION = 4  # time between data points in seconds
-TESTTIME = 20  # minutes
+TESTTIME = 1  # minutes
 
 
 def main():
@@ -30,14 +29,19 @@ def main():
     ds = DataSaver(OUTPUT)
     ds.start()
 
+    print("Getting Phone Model...")
+    model = get_phone_model()
+    print("Is the model %s correct?" % model.model)
+    input("Press Enter to confirm...")
+
     print("Disabling charging...")
-    disable_charging()
+    model.disable_charging()
     input("Is it disabled?")
 
     input("When the test is ready, start the recording by pressing enter...")
 
     print("Waiting for a percentage drop...")
-    wait_for_drop()
+    #wait_for_drop()
     print("Drop detected, starting test")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 
@@ -68,7 +72,7 @@ def main():
         print("{}: {}".format(k, v))
 
     print("Enabling charging...")
-    enable_charging()
+    model.enable_charging()
 
     print("Stopping data saver...")
     ds.stop_running()
