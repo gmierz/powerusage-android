@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from android_parser import AndroidParser
 from data_saver import DataSaver
 from adb_utils import (
     get_phone_model,
@@ -15,7 +16,9 @@ SAVERINTERVAL = 5  # seconds
 FINALLEVEL = 5
 
 
-def main():
+def main(args):
+    OUTPUT = args.output
+
     print("Running OS baseline test.\n")
     print("Make sure you have no apps running in the background.")
     print("Make sure that there is a wakelock app running.")
@@ -88,4 +91,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = AndroidParser().parse_args()
+    main(args)
