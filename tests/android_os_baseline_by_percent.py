@@ -2,9 +2,9 @@ import os
 import datetime
 import time
 
-from android_parser import AndroidParser
-from data_saver import DataSaver
-from adb_utils import (
+from utils.android_parser import AndroidParser
+from utils.data_saver import DataSaver
+from utils.adb_utils import (
     charge_battery,
     discharge_battery,
     get_phone_model,
@@ -13,18 +13,18 @@ from adb_utils import (
     parse_battery_info,
     wait_for_drop,
 )
-from utils import finish_same_line, write_same_line
+from utils.utils import finish_same_line, write_same_line
 
 OUTPUT = "/home/sparky/Documents/mozwork/"
 RESOLUTION = 4  # time between data points in seconds
 
 # start percent is exclusive, end percent is inclusive
 PERCENT_INTERVALS = [
-    #(100, 90),
-    #(90, 80),
-    #(80, 70),
-    #(70, 60),
-    #(60, 50),
+    # (100, 90),
+    # (90, 80),
+    # (80, 70),
+    # (70, 60),
+    # (60, 50),
     (50, 40),
     (40, 30),
     (30, 20),
@@ -43,8 +43,7 @@ def main(args):
     print(
         "Charging is disabled and enabled periodically throughout "
         "the tests to gather {} trials for {} percentage ranges.".format(
-            str(TRIALS),
-            str(len(PERCENT_INTERVALS))
+            str(TRIALS), str(len(PERCENT_INTERVALS))
         )
     )
 
