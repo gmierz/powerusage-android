@@ -9,18 +9,16 @@ def start_color_test(color):
 
 
 def command_for_color(color):
-	html = '<body style="background-color:%s"></body>' % color
-	html_b64 = str(
-		base64.b64encode(html.encode('ascii'))
-	).lstrip('b').replace("'", "")
+    html = '<body style="background-color:%s"></body>' % color
+    html_b64 = str(base64.b64encode(html.encode("ascii"))).lstrip("b").replace("'", "")
 
-	command = [
-		"adb",
-		"shell",
-		"am start -n org.mozilla.firefox/org.mozilla.gecko.BrowserApp " \
-		"-a android.intent.action.VIEW " \
-		"""-d "data:text/html;base64,{}" """.format(html_b64) + \
-		"--ez showstartpane false"
-	]
+    command = [
+        "adb",
+        "shell",
+        "am start -n org.mozilla.firefox/org.mozilla.gecko.BrowserApp "
+        "-a android.intent.action.VIEW "
+        """-d "data:text/html;base64,{}" """.format(html_b64)
+        + "--ez showstartpane false",
+    ]
 
-	return command
+    return command

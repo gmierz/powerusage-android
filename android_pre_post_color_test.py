@@ -7,7 +7,7 @@ from adb_utils import (
     get_phone_model,
     get_battery_info,
     parse_battery_info,
-    wait_for_drop
+    wait_for_drop,
 )
 from test_utils import start_color_test
 from utils import finish_same_line, write_same_line
@@ -29,7 +29,7 @@ def main(args):
     print("Charging is disabled before the test starts. It is")
     print("enabled automatically when we reach the end of the test.")
 
-    _ = input("Press enter when ready...")
+    input("Press enter when ready...")
     ds = DataSaver(OUTPUT)
     ds.start()
 
@@ -48,7 +48,7 @@ def main(args):
     input("When the test is ready, start the recording by pressing enter...")
 
     print("Waiting for a percentage drop...")
-    #wait_for_drop()
+    wait_for_drop()
     print("Drop detected, starting test")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 
@@ -89,9 +89,7 @@ def main(args):
 if __name__ == "__main__":
     parser = AndroidParser().get_parser()
     parser.add_argument(
-        '--color',
-        help='Color of background for the test.',
-        required=True
+        "--color", help="Color of background for the test.", required=True
     )
 
     args = parser.parse_args()

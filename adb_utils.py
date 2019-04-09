@@ -4,11 +4,11 @@ import time
 from utils import write_same_line, finish_same_line
 
 
-class PhoneModel():
+class PhoneModel:
     def __init__(self, model):
         self.model = model
-        self.disable_command = ''
-        self.enable_command = ''
+        self.disable_command = ""
+        self.enable_command = ""
 
     def disable_charging(self):
         disable_charging(model=self)
@@ -20,29 +20,28 @@ class PhoneModel():
 class PixelPhone(PhoneModel):
     def __init__(self, model):
         super(PixelPhone, self).__init__(model)
-        self.disable_command = \
+        self.disable_command = (
             "'echo 1 > /sys/class/power_supply/battery/input_suspend'"
-        self.enable_command = \
-            "'echo 0 > /sys/class/power_supply/battery/input_suspend'"
+        )
+        self.enable_command = "'echo 0 > /sys/class/power_supply/battery/input_suspend'"
 
 
 class MotoG5Phone(PhoneModel):
     def __init__(self, model):
         super(MotoG5Phone, self).__init__(model)
-        self.disable_command = \
+        self.disable_command = (
             "'echo 0 > /sys/class/power_supply/battery/charging_enabled'"
-        self.enable_command = \
+        )
+        self.enable_command = (
             "'echo 1 > /sys/class/power_supply/battery/charging_enabled'"
+        )
 
 
-MODELS = {
-    'Pixel_2': PixelPhone,
-    'Moto_G__5': MotoG5Phone
-}
+MODELS = {"Pixel_2": PixelPhone, "Moto_G__5": MotoG5Phone}
 
 
 def get_phone_model():
-    res = subprocess.check_output(["adb", "devices", "-l"]).decode('ascii')
+    res = subprocess.check_output(["adb", "devices", "-l"]).decode("ascii")
     for modelname in MODELS:
         if modelname in res:
             return MODELS[modelname](modelname)
@@ -50,33 +49,21 @@ def get_phone_model():
 
 
 def get_default_phone_model():
-    return PixelPhone('Pixel_2')
+    return PixelPhone("Pixel_2")
 
 
 def disable_charging(model=None):
     if not model:
         model = get_default_phone_model()
 
-    subprocess.check_output(
-        [
-            "adb",
-            "shell",
-            "su -c %s" % model.disable_command,
-        ]
-    )
+    subprocess.check_output(["adb", "shell", "su -c %s" % model.disable_command])
 
 
 def enable_charging(model=None):
     if not model:
         model = get_default_phone_model()
 
-    subprocess.check_output(
-        [
-            "adb",
-            "shell",
-            "su -c %s" % model.enable_command,
-        ]
-    )
+    subprocess.check_output(["adb", "shell", "su -c %s" % model.enable_command])
 
 
 def get_battery_info():
@@ -185,4 +172,4 @@ def charge_battery(targetlevel, model=None):
 
 def run_adb_command(command):
     res = subprocess.check_output(command)
-    print(res.decode('ascii'))
+    print(res.decode("ascii"))

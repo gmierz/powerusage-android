@@ -7,7 +7,7 @@ from adb_utils import (
     get_phone_model,
     get_battery_info,
     parse_battery_info,
-    wait_for_drop
+    wait_for_drop,
 )
 from utils import finish_same_line, write_same_line
 
@@ -43,7 +43,7 @@ def main(args):
     input("When the test is ready, start the recording by pressing enter...")
 
     print("Waiting for a percentage drop...")
-    #wait_for_drop()
+    # wait_for_drop()
     print("Drop detected, starting test")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 

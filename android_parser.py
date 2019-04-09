@@ -1,16 +1,14 @@
 import argparse
 
 
-class AndroidParser():
+class AndroidParser:
     def __init__(self):
         return
 
     def get_parser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument(
-            '--output',
-            help='Location to output data being saved.',
-            required=True
+            "--output", help="Location to output data being saved.", required=True
         )
 
         return parser
