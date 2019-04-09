@@ -3,11 +3,7 @@ import time
 
 from android_parser import AndroidParser
 from data_saver import DataSaver
-from adb_utils import (
-    get_phone_model,
-    get_battery_info,
-    parse_battery_info,
-)
+from adb_utils import get_phone_model, get_battery_info, parse_battery_info
 from utils import finish_same_line, write_same_line
 
 OUTPUT = "/home/sparky/Documents/mozwork/"
