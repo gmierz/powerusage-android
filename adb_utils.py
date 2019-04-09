@@ -43,9 +43,8 @@ MODELS = {
 
 def get_phone_model():
     res = subprocess.check_output(["adb", "devices", "-l"]).decode('ascii')
-    model = res.split('model:')[-1].split('device:')[0].strip()
     for modelname in MODELS:
-        if modelname in model:
+        if modelname in res:
             return MODELS[modelname](modelname)
     raise Exception("Could not find a PhoneModel for: %s" % model)
 
@@ -167,7 +166,7 @@ def charge_battery(targetlevel, model=None):
     currlevel = get_battery_level()
     decrease = False
     if currlevel == targetlevel:
-        model.discharge_battery(currlevel - 1, currlevel=currlevel)
+        discharge_battery(currlevel - 1, currlevel=currlevel, model=model)
         currlevel = get_battery_level()
 
     print("Started charging...")

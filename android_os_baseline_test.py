@@ -1,10 +1,10 @@
 import datetime
 import time
 
+from android_parser import AndroidParser
 from data_saver import DataSaver
 from adb_utils import (
-    disable_charging,
-    enable_charging,
+    get_phone_model,
     get_battery_info,
     parse_battery_info,
 )
@@ -16,7 +16,9 @@ SAVERINTERVAL = 5  # seconds
 FINALLEVEL = 5
 
 
-def main():
+def main(args):
+    OUTPUT = args.output
+
     print("Running OS baseline test.\n")
     print("Make sure you have no apps running in the background.")
     print("Make sure that there is a wakelock app running.")
@@ -27,8 +29,13 @@ def main():
     ds = DataSaver(OUTPUT)
     ds.start()
 
+    print("Getting Phone Model...")
+    model = get_phone_model()
+    print("Is the model %s correct?" % model.model)
+    input("Press Enter to confirm...")
+
     print("Disabling charging...")
-    disable_charging()
+    model.disable_charging()
     input("Is it disabled?")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 
@@ -70,13 +77,13 @@ def main():
             if telapsed < RESOLUTION:
                 time.sleep(RESOLUTION - telapsed)
     except Exception as e:
-        enable_charging()
+        model.enable_charging()
         raise
 
     finish_same_line()
 
     print("Enabling charging...")
-    enable_charging()
+    model.enable_charging()
 
     print("Stopping data saver...")
     ds.stop_running()
@@ -84,4 +91,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = AndroidParser().parse_args()
+    main(args)

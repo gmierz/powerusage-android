@@ -1,6 +1,7 @@
 import datetime
 import time
 
+from android_parser import AndroidParser
 from data_saver import DataSaver
 from adb_utils import (
     get_phone_model,
@@ -15,7 +16,9 @@ RESOLUTION = 4  # time between data points in seconds
 TESTTIME = 1  # minutes
 
 
-def main():
+def main(args):
+    OUTPUT = args.output
+
     print("Running Android Pre/Post test.\n")
     print("Make sure you have no extra apps running in the background.")
     print(
@@ -80,4 +83,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = AndroidParser().parse_args()
+    main(args)
