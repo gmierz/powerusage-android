@@ -1,14 +1,11 @@
 import argparse
 
-from test_list import TESTS
-
 
 class AndroidParser():
     def __init__(self):
         return
 
-    def parse_args(self, require_tests=False):
-        '''Read command line arguments and return options.'''
+    def get_parser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument(
             '--output',
@@ -16,22 +13,8 @@ class AndroidParser():
             required=True
         )
 
+        return parser
 
-        teststring = ' '.join(
-            ['({}) {}'.format(str(i), name) for i, name in enumerate(TESTS)]
-        )
-        args = {
-            'help': 'Test to run. '
-                'These options are curently available: %s' % teststring,
-        }
-        if require_tests:
-            args['required'] = True
-        else:
-            args['default'] = None
-
-        parser.add_argument(
-            '--test',
-            **args
-        )
-
+    def parse_args(self):
+        parser = self.get_parser()
         return parser.parse_args()

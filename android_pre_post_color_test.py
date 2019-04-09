@@ -7,9 +7,9 @@ from adb_utils import (
     get_phone_model,
     get_battery_info,
     parse_battery_info,
-    wait_for_drop,
-    start_test
+    wait_for_drop
 )
+from test_utils import start_color_test
 from utils import finish_same_line, write_same_line
 
 RESOLUTION = 4  # time between data points in seconds
@@ -20,7 +20,7 @@ def main(args):
     OUTPUT = args.output
 
     print("Running Android Pre/Post test.")
-    print("Running %s test.\n" % args.test)
+    print("Running %s background color test.\n" % args.color)
     print("Make sure you have no extra apps running in the background.")
     print(
         "Make sure that there is a wakelock app running"
@@ -42,8 +42,8 @@ def main(args):
     model.disable_charging()
     input("Is it disabled?")
 
-    print("Attempting to start %s test..." % args.test)
-    start_test(args.test)
+    print("Attempting to start %s test..." % args.color)
+    start_color_test(args.color)
 
     input("When the test is ready, start the recording by pressing enter...")
 
@@ -87,5 +87,12 @@ def main(args):
 
 
 if __name__ == "__main__":
-    args = AndroidParser().parse_args(require_tests=True)
+    parser = AndroidParser().get_parser()
+    parser.add_argument(
+        '--color',
+        help='Color of background for the test.',
+        required=True
+    )
+
+    args = parser.parse_args()
     main(args)

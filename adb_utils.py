@@ -2,7 +2,6 @@ import subprocess
 import time
 
 from utils import write_same_line, finish_same_line
-from test_list import TEST_COMMANDS
 
 
 class PhoneModel():
@@ -184,6 +183,6 @@ def charge_battery(targetlevel, model=None):
     model.disable_charging()
 
 
-def start_test(test):
-    res = subprocess.check_output(TEST_COMMANDS[test])
+def run_adb_command(command):
+    res = subprocess.check_output(command)
     print(res.decode('ascii'))
