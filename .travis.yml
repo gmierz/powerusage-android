@@ -1,3 +1,4 @@
+dist: xenial    # required for Python >=3.7; see https://docs.travis-ci.com/user/languages/python/#specifying-python-versions
 language: python
 python: 3.7
 install:
@@ -5,3 +6,4 @@ install:
 script:
   - pipenv install --dev
   - pipenv run flake8
+  - black . --diff
