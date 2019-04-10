@@ -15,7 +15,6 @@ from utils.adb_utils import (
 )
 from utils.utils import finish_same_line, write_same_line
 
-OUTPUT = "/home/sparky/Documents/mozwork/"
 RESOLUTION = 4  # time between data points in seconds
 
 # start percent is exclusive, end percent is inclusive
