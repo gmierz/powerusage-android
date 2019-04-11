@@ -11,7 +11,6 @@ from adb_utils import (
 )
 from utils import finish_same_line, write_same_line
 
-OUTPUT = "/home/sparky/Documents/mozwork/"
 RESOLUTION = 4  # time between data points in seconds
 TESTTIME = 1  # minutes
 
@@ -19,7 +18,7 @@ TESTTIME = 1  # minutes
 def main(args):
     OUTPUT = args.output
 
-    print("Running Android Pre/Post test.\n")
+    print("Running Android Pre/Post test.")
     print("Make sure you have no extra apps running in the background.")
     print(
         "Make sure that there is a wakelock app running"
@@ -44,7 +43,7 @@ def main(args):
     input("When the test is ready, start the recording by pressing enter...")
 
     print("Waiting for a percentage drop...")
-    #wait_for_drop()
+    # wait_for_drop()
     print("Drop detected, starting test")
     print("Start time: {}".format(datetime.datetime.utcnow()))
 
